@@ -14,6 +14,10 @@ export default class Select {
 		return this.options.find(option => option.selected)
 	}
 
+	get selectedOptionIndex() {
+		return this.options.indexOf(this.selectedOption)
+	}
+
 	selectValue(value) {
 		const newSelectedOption = this.options.find(option => {
 			return option.value === value
@@ -27,8 +31,21 @@ export default class Select {
 		newSelectedOption.element.selected = true
 
 		this.labelElement.innerText = newSelectedOption.label
+
+		this.optionsCustomElement
+			.querySelector(`[data-value="${prevSelectedOption.value}"]`
+		).classList.remove('selected')
+
+		const newCustomElement = this.optionsCustomElement
+			.querySelector(`[data-value="${newSelectedOption.value}"]`)
+		newCustomElement.classList.add('selected')
+		newCustomElement.scrollIntoView({ block: 'nearest' });
 	}
 }
+
+let debounceTimeout
+let searchTerm = ""
+
 
 function setupCustomElement(select) {
   select.customElement.classList.add("custom-select-container")
@@ -50,12 +67,7 @@ function setupCustomElement(select) {
 		optionElement.dataset.value = option.value
 
 		optionElement.addEventListener('click', () => {
-			select.optionsCustomElement.querySelector(
-				`[data-value="${select.selectedOption.value}"]`
-			).classList.remove('selected')
-
 			select.selectValue(option.value)
-			optionElement.classList.add('selected')
 			select.optionsCustomElement.classList.remove("show")
 		})
 
@@ -70,6 +82,37 @@ function setupCustomElement(select) {
 	select.customElement.addEventListener('blur', () => [
 		select.optionsCustomElement.classList.remove('show')
 	])
+
+	select.customElement.addEventListener('keydown', e => {
+		switch (e.code) {
+			case 'Space':
+				select.optionsCustomElement.classList.toggle('show')
+				break
+			case 'ArrowUp':
+				const prevOption = select.options[select.selectedOptionIndex - 1]
+				if (prevOption) { select.selectValue(prevOption.value) }
+				break
+			case 'ArrowDown':
+				const nextOption = select.options[select.selectedOptionIndex + 1]
+				if (nextOption) { select.selectValue(nextOption.value) }
+				break
+			case 'Enter':
+			case 'Escape':
+				select.optionsCustomElement.classList.remove('show')
+				break
+			default:
+				clearTimeout(debounceTimeout)
+				searchTerm += e.key
+				debounceTimeout = setTimeout(() => {
+					searchTerm  = ""
+				}, 500)
+				// console.log(searchTerm)
+				const searchedOpt = select.options.find(option => {
+					return option.label.toLowerCase().startsWith(searchTerm)
+				})
+				if (searchedOpt) select.selectValue(searchedOpt.value)
+		}
+	})
 }
 
 function getFormattedOptions(options) {
