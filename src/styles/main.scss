@@ -6,6 +6,10 @@ html {
   color: $font-color;
 }
 
+body  {
+	padding: 5%;
+}
+
 h1  {
 	color: teal;
 }
@@ -13,4 +17,9 @@ h1  {
 h4 {
 	color: black;
 	text-decoration: dashed;
+}
+
+.custom-select-options {
+	border: 1px solid blue;
+	padding: 10px;
 }

@@ -1,19 +1,8 @@
 import './styles/main.scss'
+import Select from './scripts/select.js'
 // Create a class property without a constructor
-class Game {
-  name = 'Street Basketball'
-}
-const myGame = new Game()
-// Create paragraph node
-const p = document.createElement('p')
-p.textContent = `I like ${myGame.name}.`
-console.log('works')
-// Create heading node
-const heading = document.createElement('h1')
-heading.textContent = 'Interesting!'
+const selectElements = document.querySelectorAll('[data-custom]')
 
-// Images
-import example from './img/example.png'
-// Append SVG and heading nodes to the DOM
-const app = document.querySelector('#root')
-app.append(heading, p)
+selectElements.forEach(selectElement => {
+	new Select(selectElement)
+})
